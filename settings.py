@@ -21,6 +21,6 @@ symbols = {
 }
 
 # Audio
-PLAY_SOUND = True
+PLAY_SOUND = False
 MAIN_SOUND = 'audio/main_sound.mp3'
 
