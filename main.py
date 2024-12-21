@@ -41,7 +41,7 @@ class Game:
 
             pygame.display.update()
             self.screen.blit(self.bg_image, (0,0))
-            self.machine.update(self.delta_time)
+            self.machine.update(self.delta_time, self.screen)
             self.clock.tick(FPS)
 
 if __name__ == "__main__":

@@ -6,11 +6,11 @@ import random
 from settings import *
 
 class Reel:
-    def __init__(self, pos:tuple):
+    def __init__(self, pos):
         self.symbol_list = pygame.sprite.Group()
         self.shuffled_keys = list(symbols.keys())
         random.shuffle(self.shuffled_keys)
-        self.shuffled_keys = self.shuffled_keys[:3]
+        init_keys = self.shuffled_keys[:4]
 
         self.reel_is_spinning = False
         
@@ -18,16 +18,16 @@ class Reel:
         # self.stop_sound = pygame.mixer.Sound('audio/stop.mp3')
         # self.stop_sound.set_volume(0.5)
 
-        for idx, item in enumerate(self.shuffled_keys):
+        for idx, item in enumerate(init_keys):
             self.symbol_list.add(Symbol(symbols[item], pos, idx))
             pos = list(pos)
-            pos[1] += 300
+            pos[1] += 150
             pos = tuple(pos)
 
     def animate(self, delta_time):
         if self.reel_is_spinning:
             self.delay_time -= (delta_time * 1000)
-            self.spin_time = (delta_time * 1000)
+            self.spin_time -= (delta_time * 1000)
             reel_is_stopping = False
 
             if self.spin_time < 0:
@@ -38,10 +38,10 @@ class Reel:
 
                 # Iterate through all 3 symbols in reeel; truncate; add new random symbol on top of stack
                 for symbol in self.symbol_list:
-                    symbol.rect.bottom += 100
+                    symbol.rect.bottom += 50
 
-                    # Correct spacing is dependant on the adobe addition eventually hitting 1200?
-                    if symbol.rect.top == 1200:
+                    # Correct spacing is dependant on the adove addition eventually hitting 1200?
+                    if symbol.rect.top == 700:
                         if reel_is_stopping:
                             self.reel_is_spinning = False
                             # self.stop_sound.play()
@@ -49,11 +49,11 @@ class Reel:
                         symbol_idx = symbol.idx
                         symbol.kill()
                         # Spawn random symbol in place of the above
-                        self.symbol_list.add(Symbol(symbols[random.choice(self.shuffled_keys)], ((symbol.x_val), -300), symbol_idx))
+                        self.symbol_list.add(Symbol(symbols[random.choice(self.shuffled_keys)], ((symbol.x_val), 100), symbol_idx))
 
     def start_spin(self, delay_time):
         self.delay_time = delay_time
-        self.spin_time = 1000 + delay_time
+        self.spin_time = 3000 + delay_time
         self.reel_is_spinning = True
 
 class Symbol(pygame.sprite.Sprite):
@@ -66,7 +66,7 @@ class Symbol(pygame.sprite.Sprite):
         self.pos = pos
         self.idx = idx
         self.image = pygame.image.load(pathToFile).convert_alpha()
-        self.image = pygame.transform.scale(self.image, (128, 128))
+        self.image = pygame.transform.scale(self.image, (SYM_SIZE, SYM_SIZE))
         self.rect = self.image.get_rect(topleft = pos)
         self.x_val = self.rect.left
 
