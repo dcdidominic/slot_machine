@@ -3,13 +3,9 @@ import usb.core
 import usb.util
 import time
 
-VENDOR_ID = 0x0922
-PRODUCT_ID = 0x8003
-MAX_ATTEMPTS = 10
-CHIP_WEIGHT = 12
-CREDIT_VALUE_SPINS = 5
+from settings import *
 
-class Weight():
+class Creditor():
     def __init__(self):
         self.device = self.find_device()
         self.device_status = True
@@ -27,6 +23,10 @@ class Weight():
     def set_jackpot_weight(self):
         current_weight = self.read_data(self.device, self.endpoint)
         self.jackpot_weight = current_weight - self.tare_weight
+
+    def set_win_condition(self):
+        self.ref_chips = 0
+        self.credits = 0
     
     def check_credit(self):
         self.check_device_status()
@@ -37,15 +37,23 @@ class Weight():
         num_chips = round((current_weight - self.jackpot_weight - self.tare_weight) / CHIP_WEIGHT)
         if num_chips-self.ref_chips > 2:
             print('ERROR: Tampering detected.')
+            self.stolen = False
+            self.tamper = True
             return False
         if num_chips == self.ref_chips:
-            return False
+            self.stolen = False
+            self.tamper = False
+            return True
         if num_chips < self.ref_chips:
             print('ERROR: Stolen Chips!')
+            self.stolen = True
+            self.tamper = False
             return False
         if num_chips > self.ref_chips:
             self.credits += 1
             self.ref_chips = num_chips
+            self.stolen = False
+            self.tamper = False
             return True
         
     def find_device(self):
@@ -82,16 +90,24 @@ class Weight():
         attempts = MAX_ATTEMPTS
         while attempts > 0:
             try:
-                data = device.read(endpoint.bEndpointAddress, endpoint.wMaxPacketSize)
+                data = self.device.read(endpoint.bEndpointAddress, endpoint.wMaxPacketSize)
                 grams = data[4] + (256 * data[5])
                 #print(str(grams) + "g")
                 return grams
             except usb.core.USBError as e:
-                device.set_configuration()
-                attempts -= 1
-                print("Failure! Attempts left:", attempts)
+                time.sleep(1)
+                self.check_device_status()
+                while self.device_status == False:
+                    print('Device Offline')
+                    self.check_device_status()
+                    time.sleep(1)
+                if self.device.is_kernel_driver_active(0):
+                    self.device.detach_kernel_driver(0)
+                # self.device.set_configuration()
+                # attempts -= 1
+                # print("Failure! Attempts left:", attempts)
 
-            time.sleep(1)
+            # time.sleep(1)
 
         print("Failed to connect")
 
@@ -102,11 +118,11 @@ class Weight():
 # while True:
 #     read_data(device, endpoint)
 
-weight = Weight()
+# creditor = Creditor()
 
-while True:
-    weight.check_credit()
-    print(f'Current Credits: {weight.credits}')
-    print(f'Current Number of Spins: {weight.credits*CREDIT_VALUE_SPINS}')
-    print()
-    time.sleep(1)
+# while True:
+#     creditor.check_credit()
+#     print(f'Current Credits: {creditor.credits}')
+#     print(f'Current Number of Spins: {creditor.credits*CREDIT_VALUE_SPINS}')
+#     print()
+#     time.sleep(1)

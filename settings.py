@@ -27,3 +27,10 @@ symbols = {
 PLAY_SOUND = False
 MAIN_SOUND = 'audio/main_sound.mp3'
 
+# USB Weight Scale
+VENDOR_ID = 0x0922
+PRODUCT_ID = 0x8003
+MAX_ATTEMPTS = 10
+CHIP_WEIGHT = 12
+CREDIT_VALUE_SPINS = 5
+
