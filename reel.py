@@ -40,7 +40,7 @@ class Reel:
                 for symbol in self.symbol_list:
                     symbol.rect.bottom += 50
 
-                    # Correct spacing is dependant on the adove addition eventually hitting 1200?
+                    # Correct spacing is dependant on the adove addition eventually hitting 700?
                     if symbol.rect.top == 700:
                         if reel_is_stopping:
                             self.reel_is_spinning = False
@@ -55,6 +55,9 @@ class Reel:
         self.delay_time = delay_time
         self.spin_time = 3000 + delay_time
         self.reel_is_spinning = True
+
+    def reel_spin_result(self):
+        return self.symbol_list.sprites()[1].sym_type
 
 class Symbol(pygame.sprite.Sprite):
     def __init__(self, pathToFile, pos, idx):

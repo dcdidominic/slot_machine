@@ -10,9 +10,12 @@ class Machine:
         self.reel_list = {}
         self.can_toggle = True
         self.spinning = False
+        
+        # Results
+        self.prev_result = {0: None, 1: None, 2: None}
+        self.spin_result = {0: None, 1: None, 2: None}
 
         # load mask images
-
         self.top_mask =   pygame.image.load(TOP_MASK).convert_alpha()
         self.bottom_mask = pygame.image.load(BOTTOM_MASK).convert_alpha()
 
@@ -26,8 +29,11 @@ class Machine:
                 self.spinning = True
 
         if not self.can_toggle and [self.reel_list[reel].reel_is_spinning for reel in self.reel_list].count(False) == 3:
+            
+            # Results
+            results = list(self.get_result().values())
+            print(all(x == results[0] for x in results))
             self.can_toggle = True
-
 
     def input(self):
         keys = pygame.key.get_pressed()
@@ -64,6 +70,11 @@ class Machine:
             for reel in self.reel_list:
                 self.reel_list[reel].start_spin(int(reel) * 200)
                 # self.spin_sound.play()
+
+    def get_result(self):
+        for reel in self.reel_list:
+            self.spin_result[reel] = self.reel_list[reel].reel_spin_result()
+        return self.spin_result
 
     def update(self, delta_time, screen):
         self.cooldowns()
