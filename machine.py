@@ -8,7 +8,6 @@ from reel import Reel
 from player import Player
 from settings import *
 from creditor import Creditor
-from debug import debug
 from messages import Messages
 
 
