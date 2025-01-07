@@ -3,30 +3,32 @@ import usb.core
 import usb.util
 import time
 
+import pygame
+pygame.init()
+
 from settings import *
 
 class Creditor():
-    def __init__(self):
+    def __init__(self, starting_pot):
         self.device = self.find_device()
         self.device_status = True
         self.endpoint = self.device[0][(0,0)][0]
         self.jackpot_weight = 0
-        self.tare_weight = self.read_data(self.device, self.endpoint)
+        self.ref_chips = starting_pot
+        self.tare_weight = self.read_data(self.device, self.endpoint) - (CHIP_WEIGHT*starting_pot)
         self.credits = 0
-        self.ref_chips = 0
         self.tamper = False
         self.stolen = False
 
     def set_tare_weight(self):
         self.tare_weight = self.read_data(self.device, self.endpoint)
 
-    def set_jackpot_weight(self):
-        current_weight = self.read_data(self.device, self.endpoint)
-        self.jackpot_weight = current_weight - self.tare_weight
-
-    def set_win_condition(self):
+    def jackpot_reset(self):
+        self.set_tare_weight()
         self.ref_chips = 0
         self.credits = 0
+        self.tamper = False
+        self.stolen = False
     
     def check_credit(self):
         self.check_device_status()
@@ -41,6 +43,7 @@ class Creditor():
             self.tamper = True
             return False
         if num_chips == self.ref_chips:
+            # print('Running.')
             self.stolen = False
             self.tamper = False
             return True
@@ -50,6 +53,7 @@ class Creditor():
             self.tamper = False
             return False
         if num_chips > self.ref_chips:
+            print('Credit Added.')
             self.credits += 1
             self.ref_chips = num_chips
             self.stolen = False
@@ -97,10 +101,12 @@ class Creditor():
             except usb.core.USBError as e:
                 time.sleep(1)
                 self.check_device_status()
-                while self.device_status == False:
+                if self.device_status == False:
                     print('Device Offline')
-                    self.check_device_status()
-                    time.sleep(1)
+                    # self.check_device_status()
+                    # display_surface = pygame.display.get_surface()
+                    # display_surface.blit(self.scale_pwr_img, (0,0))
+                    # time.sleep(1)
                 if self.device.is_kernel_driver_active(0):
                     self.device.detach_kernel_driver(0)
                 # self.device.set_configuration()

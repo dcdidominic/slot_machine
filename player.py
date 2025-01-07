@@ -4,25 +4,21 @@ class Player():
     def __init__(self):
         self.balance = 0
         self.bet_size = 1
-        self.last_payout = 0
-        self.total_won = 0
-        self.total_wager = 0
         self.can_spin = False
         self.credit_spins = 0
         self.debit_spins = 0
 
     def get_data(self):
         player_data = {}
-        player_data['balance'] = "{:.2f}".format(self.balance)
-        player_data['bet_size'] = "{:.2f}".format(self.bet_size)
-        player_data['last_payout'] = "{:.2f}".format(self.last_payout) if self.last_payout else "N/A"
-        player_data['total_won'] = "{:.2f}".format(self.total_won)
-        player_data['total_wager'] = "{:.2f}".format(self.total_wager)
+        player_data['balance'] = str(int(self.balance))
+        player_data['spins'] = str(int(self.credit_spins - self.debit_spins))
+        player_data['can_spin'] = str(self.can_spin)
         return player_data
     
     def place_bet(self):
         self.debit_spins += 1
-
-        # bet = self.bet_size
-        # self.balance -= bet
-        # self.total_wager += bet
+        
+    def jackpot_reset(self):
+        self.balance = 0
+        self.credit_spins = 0
+        self.debit_spins = 0

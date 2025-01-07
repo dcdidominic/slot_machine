@@ -1,6 +1,6 @@
 # Display settings
 DEFAULT_IMAGE_SIZE = (128,128)
-FPS = 240
+FPS = 30
 HEIGHT = 1000
 WIDTH = 1600
 START_X, START_Y = 500, -300
@@ -10,6 +10,13 @@ X_OFFSET, Y_OFFSET = 10, 0
 BG_IMAGE_PATH = 'graphics/background.png'
 TOP_MASK = 'graphics/bg_top.png'
 BOTTOM_MASK = 'graphics/bg_bottom.png'
+STOLEN_IMG = 'graphics/stolen.png'
+TAMPER_IMG = 'graphics/tamper.png'
+SCALE_PWR_IMG = 'graphics/scale_power.png'
+JACKPOT_IMG = 'graphics/jackpot.png'
+CHICKEN_WIN_IMG = 'graphics/chicken_win.png'
+BEER_WIN_IMG = 'graphics/beer_win.png'
+CHANCE_WIN_IMG = 'graphics/chance_win.png'
 GAME_INDICIES = [1, 2, 3] # 0 and 4 are outside the playing area
 SYM_PATH = 'graphics/symbols'
 SYM_SIZE = 128

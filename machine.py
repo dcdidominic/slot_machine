@@ -1,19 +1,26 @@
 import pygame
 import random
+import time
+
+import usb.core
 
 from reel import Reel
 from player import Player
 from settings import *
 from creditor import Creditor
+from debug import debug
+from messages import Messages
+
+
 
 class Machine:
-    def __init__(self):
+    def __init__(self, starting_pot):
         self.display_surface = pygame.display.get_surface()
         self.reel_index = 0
         self.reel_list = {}
         self.can_toggle = True
         self.spinning = False
-        self.win_animation_ongoing = False
+        self.win_reset = False
         
         # Results
         self.prev_result = {0: None, 1: None, 2: None}
@@ -22,13 +29,14 @@ class Machine:
         # load mask images
         self.top_mask =   pygame.image.load(TOP_MASK).convert_alpha()
         self.bottom_mask = pygame.image.load(BOTTOM_MASK).convert_alpha()
-
         self.spawn_reels()
 
         # configure pot and player
-        self.creditor = Creditor()
+        self.creditor = Creditor(starting_pot)
 
         self.currPlayer = Player()
+
+        self.message_handler = Messages()
 
     def cooldowns(self):
         # Only lets player spin if all reels are NOT spinning
@@ -38,28 +46,51 @@ class Machine:
                 self.spinning = True
 
         if not self.can_toggle and [self.reel_list[reel].reel_is_spinning for reel in self.reel_list].count(False) == 3:
-            
+            self.can_toggle = True
+
+    def check_win(self):
+        # Only lets player spin if all reels are NOT spinning
+        for reel in self.reel_list:
+            if self.reel_list[reel].reel_is_spinning:
+                self.can_toggle = False
+                self.spinning = True
+
+        if not self.can_toggle and [self.reel_list[reel].reel_is_spinning for reel in self.reel_list].count(False) == 3:
+            # self.can_toggle = True
+        
             # Results
             results = list(self.get_result().values())
             win = all(x == results[0] for x in results)
-            print(results[0]) if win else print(False)
-            self.can_toggle = True
 
             if win:
-                # Play the win sound
-                # self.play_win_sound(self.win_data)
-                self.pay_player(win, self.currPlayer)
-                print(self.currPlayer.get_data())
-                self.creditor.set_win_condition()
-                # self.win_animation_ongoing = True
-                # self.ui.win_text_angle = random.randint(-4, 4)
+                win_type = results[0].split('/')[-1]
+                time.sleep(1)
+                if win_type in ['skis','seven']:
+                    self.message_handler.display_jackpot()
+                if win_type in ['chicken']:
+                    self.message_handler.display_chicken()
+                if win_type in ['chance']:
+                    self.message_handler.display_chance()
+                if win_type in ['beer']:
+                    self.message_handler.display_beer()
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_SPACE]:
+                    self.message_handler.sound_playing = False
+                    if win_type in ['skis','seven']:
+                        self.creditor.jackpot_reset()
+                    self.currPlayer.jackpot_reset()
+                    self.win_reset = True
+                    self.can_toggle = True
+                    return False
+
+                return True
+            else:
+                return False
 
     def handle_player(self):
         self.currPlayer.can_spin = self.creditor.check_credit()
         self.currPlayer.credit_spins = self.creditor.credits * CREDIT_VALUE_SPINS
         self.currPlayer.balance = self.currPlayer.credit_spins - self.currPlayer.debit_spins
-
-        print(self.currPlayer.balance)
 
     def input(self):
         keys = pygame.key.get_pressed()
@@ -69,8 +100,7 @@ class Machine:
         if keys[pygame.K_SPACE]:
             self.toggle_spinning()
             self.spin_time = pygame.time.get_ticks()
-            # self.machine_balance += self.currPlayer.bet_size()
-            # self.currPlayer.last_payout = None
+            self.win_reset = False
 
     def draw_reels(self, delta_time):
         for reel in self.reel_list:
@@ -107,17 +137,31 @@ class Machine:
         pass
 
     def update(self, delta_time, screen):
-        if not self.creditor.check_device_status:
-            return
-        self.cooldowns()
-        self.handle_player()
-        self.input()
-        self.draw_reels(delta_time)
-        for reel in self.reel_list:
-            self.reel_list[reel].symbol_list.draw(self.display_surface)
-            screen.blit(self.top_mask, (0,0))
-            screen.blit(self.bottom_mask, (0,0))
-            self.reel_list[reel].symbol_list.update()
+        try:
+            # Win condition
+            if self.check_win() == True and not self.win_reset:
+                return
+            
+            # Play
+            if not self.creditor.check_device_status:
+                return
+            self.cooldowns()
+            self.handle_player()
+            self.input()
+            self.draw_reels(delta_time)
+            for reel in self.reel_list:
+                self.reel_list[reel].symbol_list.draw(self.display_surface)
+                screen.blit(self.top_mask, (0,0))
+                screen.blit(self.bottom_mask, (0,0))
+                self.reel_list[reel].symbol_list.update()
 
-        # debug_player_data = self.currPlayer.get_data()
-        # machine_balance = 
+            self.message_handler.check_creditor(creditor=self.creditor)
+            if self.creditor.device_status == False:
+                self.message_handler.display_scale_error()
+
+            debug_player_data = self.currPlayer.get_data()
+            self.message_handler.display_spin_count(f"Spins Remaining: {debug_player_data['spins']} | Estimated Pot: {self.creditor.ref_chips}")
+            
+        # Handle Auto-Shutoff from Scale
+        except usb.core.USBError as e:
+            self.message_handler.display_scale_error()
