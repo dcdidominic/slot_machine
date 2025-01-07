@@ -9,6 +9,7 @@ from player import Player
 from settings import *
 from creditor import Creditor
 from messages import Messages
+from joystick import Joystick
 
 
 
@@ -20,6 +21,9 @@ class Machine:
         self.can_toggle = True
         self.spinning = False
         self.win_reset = False
+
+        # init joystick
+        self.joystick = Joystick()
         
         # Results
         self.prev_result = {0: None, 1: None, 2: None}
@@ -73,7 +77,7 @@ class Machine:
                 if win_type in ['beer']:
                     self.message_handler.display_beer()
                 keys = pygame.key.get_pressed()
-                if keys[pygame.K_SPACE]:
+                if keys[pygame.K_SPACE] or self.joystick.check_joystick_pull_back():
                     self.message_handler.sound_playing = False
                     if win_type in ['skis','seven']:
                         self.creditor.jackpot_reset()
@@ -96,7 +100,7 @@ class Machine:
 
         # checks for space key, ability to togggle spin, and balance to cover bet
         #if keys[pygame.K_SPACE] and self.can_toggle and self.currPlayer.balance >= self.currPlayer.bet_size:
-        if keys[pygame.K_SPACE]:
+        if keys[pygame.K_SPACE] or self.joystick.check_joystick_pull_back():
             self.toggle_spinning()
             self.spin_time = pygame.time.get_ticks()
             self.win_reset = False
