@@ -60,7 +60,7 @@ class Messages():
     def display_jackpot(self):
         display_surface = pygame.display.get_surface()
         display_surface.blit(self.jackpot_img, (0,0)) 
-        self.jackpot_sound.play() if not self.sound_playing else None
+        self.jackpot_sound.play(loops=3) if not self.sound_playing else None
         self.sound_playing = True
 
     def display_chicken(self):
