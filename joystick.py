@@ -7,6 +7,7 @@ class Joystick():
         if pygame.joystick.get_count() > 0:
             self.joystick = pygame.joystick.Joystick(0)
             self.joystick.init()
+            self.y_axis_calibrate = self.joystick.get_axis(1)  # Get the value of the y-axis (usually axis 1)
             print("Joystick connected")
         else:
             self.joystick = None
@@ -23,6 +24,6 @@ class Joystick():
     def check_joystick_pull_back(self):
         if self.joystick:
             y_axis = self.joystick.get_axis(1)  # Get the value of the y-axis (usually axis 1)
-            if y_axis > 0.5:  # Adjust the threshold as needed
+            if y_axis-self.y_axis_calibrate > 0.25:  # Adjust the threshold as needed
                 return True
         return False

@@ -15,8 +15,8 @@ class Reel:
         self.reel_is_spinning = False
         
         # Sounds
-        # self.stop_sound = pygame.mixer.Sound('audio/stop.mp3')
-        # self.stop_sound.set_volume(0.5)
+        self.stop_sound = pygame.mixer.Sound(STOP_SOUND)
+        self.stop_sound.set_volume(0.5)
 
         for idx, item in enumerate(init_keys):
             self.symbol_list.add(Symbol(symbols[item], pos, idx))
@@ -36,15 +36,15 @@ class Reel:
             # Stagger reel spin start animcation
             if self.delay_time <= 0:
 
-                # Iterate through all 3 symbols in reeel; truncate; add new random symbol on top of stack
+                # Iterate through all 3 symbols in reel; truncate; add new random symbol on top of stack
                 for symbol in self.symbol_list:
-                    symbol.rect.bottom += 50
+                    symbol.rect.bottom += 75
 
                     # Correct spacing is dependant on the adove addition eventually hitting 700?
                     if symbol.rect.top == 700:
                         if reel_is_stopping:
                             self.reel_is_spinning = False
-                            # self.stop_sound.play()
+                            self.stop_sound.play()
                         
                         symbol_idx = symbol.idx
                         symbol.kill()

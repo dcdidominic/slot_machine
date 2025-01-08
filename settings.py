@@ -1,6 +1,6 @@
 # Display settings
 DEFAULT_IMAGE_SIZE = (128,128)
-FPS = 30
+FPS = 60
 HEIGHT = 1000
 WIDTH = 1600
 START_X, START_Y = 500, -300
@@ -31,13 +31,24 @@ symbols = {
 }
 
 # Audio
-PLAY_SOUND = False
+PLAY_SOUND = True
 MAIN_SOUND = 'audio/main_sound.mp3'
+SPIN_SOUND = 'audio/spin_sound.mp3'
+STOP_SOUND = 'audio/stop_sound.mp3'
+JACKPOT_WIN_SOUND = 'audio/jackpot_win.mp3'
+CHICKEN_SOUND = 'audio/chicken_sound.mp3'
+BEER1_SOUND = 'audio/beer1.mp3'
+BEER2_SOUND = 'audio/beer2.mp3'
+CHANCE_SOUND = 'audio/chance.mp3'
 
 # USB Weight Scale
 VENDOR_ID = 0x0922
 PRODUCT_ID = 0x8003
 MAX_ATTEMPTS = 10
-CHIP_WEIGHT = 12
+CHIP_WEIGHT = 10
 CREDIT_VALUE_SPINS = 5
+
+# CHEATS
+SUPER_SPIN = False
+CONTINUOUS_SPIN = False
 

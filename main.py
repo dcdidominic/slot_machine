@@ -24,6 +24,7 @@ class Game:
         # Sound
         if PLAY_SOUND:
             main_sound = pygame.mixer.Sound(MAIN_SOUND)
+            main_sound.set_volume(0.5)
             main_sound.play(loops=-1)
 
     def run(self):

@@ -10,7 +10,7 @@ from settings import *
 class Messages():
 
     def __init__(self):
-        self.sound_playing = False
+        # Images
         self.font = pygame.font.Font(None, 30)
         self.stolen_img = pygame.image.load(STOLEN_IMG).convert_alpha()
         self.tamper_img = pygame.image.load(TAMPER_IMG).convert_alpha()
@@ -19,6 +19,19 @@ class Messages():
         self.chicken_win_img = pygame.image.load(CHICKEN_WIN_IMG).convert_alpha()
         self.beer_win_img = pygame.image.load(BEER_WIN_IMG).convert_alpha()
         self.chance_win_img = pygame.image.load(CHANCE_WIN_IMG).convert_alpha()
+        
+        # Sounds
+        self.sound_playing = False
+        self.jackpot_sound = pygame.mixer.Sound(JACKPOT_WIN_SOUND)
+        self.jackpot_sound.set_volume(1.0)
+        self.chicken_sound = pygame.mixer.Sound(CHICKEN_SOUND)
+        self.chicken_sound.set_volume(1.0)
+        self.beer1_sound = pygame.mixer.Sound(BEER1_SOUND)
+        self.beer1_sound.set_volume(1.0)
+        self.beer2_sound = pygame.mixer.Sound(BEER2_SOUND)
+        self.beer2_sound.set_volume(1.0)
+        self.CHANCE_sound = pygame.mixer.Sound(CHANCE_SOUND)
+        self.CHANCE_sound.set_volume(1.0)
         
 
     def check_creditor(self, creditor:Creditor):
@@ -47,19 +60,24 @@ class Messages():
     def display_jackpot(self):
         display_surface = pygame.display.get_surface()
         display_surface.blit(self.jackpot_img, (0,0)) 
+        self.jackpot_sound.play() if not self.sound_playing else None
         self.sound_playing = True
 
     def display_chicken(self):
         display_surface = pygame.display.get_surface()
         display_surface.blit(self.chicken_win_img, (0,0)) 
+        self.chicken_sound.play() if not self.sound_playing else None
         self.sound_playing = True
 
     def display_beer(self):
         display_surface = pygame.display.get_surface()
         display_surface.blit(self.beer_win_img, (0,0))
+        self.beer1_sound.play() if not self.sound_playing else None
+        self.beer2_sound.play() if not self.sound_playing else None
         self.sound_playing = True
 
     def display_chance(self):
         display_surface = pygame.display.get_surface()
         display_surface.blit(self.chance_win_img, (0,0)) 
+        self.chance_sound.play() if not self.sound_playing else None
         self.sound_playing = True

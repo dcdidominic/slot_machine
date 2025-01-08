@@ -34,6 +34,10 @@ class Machine:
         self.bottom_mask = pygame.image.load(BOTTOM_MASK).convert_alpha()
         self.spawn_reels()
 
+        # sounds
+        self.spin_sound = pygame.mixer.Sound(SPIN_SOUND)
+        self.spin_sound.set_volume(0.5)
+
         # configure pot and player
         self.creditor = Creditor(starting_pot)
 
@@ -100,7 +104,7 @@ class Machine:
 
         # checks for space key, ability to togggle spin, and balance to cover bet
         #if keys[pygame.K_SPACE] and self.can_toggle and self.currPlayer.balance >= self.currPlayer.bet_size:
-        if keys[pygame.K_SPACE] or self.joystick.check_joystick_pull_back():
+        if keys[pygame.K_SPACE] or self.joystick.check_joystick_pull_back() or CONTINUOUS_SPIN:
             self.toggle_spinning()
             self.spin_time = pygame.time.get_ticks()
             self.win_reset = False
@@ -128,17 +132,13 @@ class Machine:
             self.currPlayer.place_bet()
             for reel in self.reel_list:
                 self.reel_list[reel].start_spin(int(reel) * 200)
-                # self.spin_sound.play()
+                self.spin_sound.play()
 
     def get_result(self):
         for reel in self.reel_list:
             self.spin_result[reel] = self.reel_list[reel].reel_spin_result()
         return self.spin_result
     
-    def pay_player(self, win_data, curr_player):
-        # This will refernce the creditor
-        pass
-
     def update(self, delta_time, screen):
         try:
             # Win condition

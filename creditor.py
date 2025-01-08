@@ -16,7 +16,7 @@ class Creditor():
         self.jackpot_weight = 0
         self.ref_chips = starting_pot
         self.tare_weight = self.read_data(self.device, self.endpoint) - (CHIP_WEIGHT*starting_pot)
-        self.credits = 0
+        self.credits = 10000 if SUPER_SPIN else 0
         self.tamper = False
         self.stolen = False
 
@@ -26,7 +26,7 @@ class Creditor():
     def jackpot_reset(self):
         self.set_tare_weight()
         self.ref_chips = 0
-        self.credits = 0
+        self.credits = 10000 if SUPER_SPIN else 0
         self.tamper = False
         self.stolen = False
     
@@ -47,7 +47,7 @@ class Creditor():
             self.stolen = False
             self.tamper = False
             return True
-        if num_chips < self.ref_chips:
+        if num_chips < (self.ref_chips-1):
             print('ERROR: Stolen Chips!')
             self.stolen = True
             self.tamper = False
