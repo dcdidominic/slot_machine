@@ -30,8 +30,8 @@ class Messages():
         self.beer1_sound.set_volume(1.0)
         self.beer2_sound = pygame.mixer.Sound(BEER2_SOUND)
         self.beer2_sound.set_volume(1.0)
-        self.CHANCE_sound = pygame.mixer.Sound(CHANCE_SOUND)
-        self.CHANCE_sound.set_volume(1.0)
+        self.chance_sound = pygame.mixer.Sound(CHANCE_SOUND)
+        self.chance_sound.set_volume(1.0)
         
 
     def check_creditor(self, creditor:Creditor):
