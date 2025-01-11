@@ -36,7 +36,7 @@ class Creditor():
             print("Please Reboot Device.")
             return False
         current_weight = self.read_data(self.device, self.endpoint)
-        num_chips = round((current_weight - self.jackpot_weight - self.tare_weight) / CHIP_WEIGHT)
+        num_chips = int((current_weight - self.jackpot_weight - self.tare_weight) / CHIP_WEIGHT)
         if num_chips-self.ref_chips > 2:
             print('ERROR: Tampering detected.')
             self.stolen = False
